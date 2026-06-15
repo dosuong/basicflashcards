@@ -18,6 +18,9 @@
   height: 380px;
   margin-bottom: 3rem;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .flashcard {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import Flashcard from '../components/Flashcard';
 import AddFlashcard from '../components/AddFlashcard';
@@ -12,6 +12,8 @@ export default function Home() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const touchStartX = useRef(null);
+  const touchEndX = useRef(null);
 
   useEffect(() => {
     fetchFlashcards();
@@ -60,13 +62,47 @@ export default function Home() {
     setCurrentIndex(0);
   };
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50;
+
+    if (distance > minSwipeDistance) {
+      // Swipe Left -> Next
+      handleNext();
+    } else if (distance < -minSwipeDistance) {
+      // Swipe Right -> Prev
+      handlePrev();
+    }
+    
+    // Reset values
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   return (
     <main className={styles.container}>
       {loading ? (
         <div className={styles.emptyState}>Loading flashcards...</div>
       ) : flashcards.length > 0 ? (
         <>
-          <Flashcard key={flashcards[currentIndex].id} card={flashcards[currentIndex]} />
+          <div 
+            onTouchStart={handleTouchStart} 
+            onTouchMove={handleTouchMove} 
+            onTouchEnd={handleTouchEnd}
+            style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+          >
+            <Flashcard key={flashcards[currentIndex].id} card={flashcards[currentIndex]} />
+          </div>
           
           <div className={styles.controls}>
             <button 
