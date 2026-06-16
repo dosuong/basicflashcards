@@ -8,6 +8,7 @@ import styles from './page.module.css';
 
 export default function ManageFlashcards() {
   const [flashcards, setFlashcards] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [editingCard, setEditingCard] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -64,17 +65,31 @@ export default function ManageFlashcards() {
     setEditingCard(null);
   };
 
+  const filteredFlashcards = flashcards.filter(card => 
+    card.english_word.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    card.vietnamese_meaning.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <main className={styles.manageContainer}>
       <div className={styles.header}>
         <h1>Manage Cards</h1>
+        <div className={styles.searchContainer}>
+          <input
+            type="text"
+            placeholder="Search flashcards..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
       </div>
 
       <div className={styles.grid}>
         {loading ? (
           <div className={styles.emptyState}>Loading flashcards...</div>
-        ) : flashcards.length > 0 ? (
-          flashcards.map((card) => (
+        ) : filteredFlashcards.length > 0 ? (
+          filteredFlashcards.map((card) => (
             <div key={card.id} className={styles.card}>
               <div>
                 <div className={styles.itemWord}>{card.english_word}</div>
