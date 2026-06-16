@@ -45,21 +45,20 @@ export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
           />
         </div>
         <div className={styles.formGroup}>
-          <label>Vietnamese Meaning</label>
-          <input 
-            type="text" 
+          <label>Vietnamese Meaning / Extra Info</label>
+          <textarea 
             value={meaning} 
             onChange={(e) => setMeaning(e.target.value)} 
             required 
-            placeholder="e.g. Sự tình cờ may mắn"
-          />
+            rows="5"
+          ></textarea>
         </div>
         <div className={styles.formGroup}>
           <label>Example Sentence (Optional)</label>
           <textarea 
             value={example} 
             onChange={(e) => setExample(e.target.value)} 
-            rows="2"
+            rows="3"
             placeholder="They found each other by pure serendipity."
           ></textarea>
         </div>
