@@ -33,8 +33,8 @@ export default function AddFlashcard({ onAdd, onCancel }) {
   };
 
   return (
-    <div className={styles.modalOverlay} onMouseDown={onCancel}>
-      <div className={styles.modalContent} onMouseDown={(e) => e.stopPropagation()}>
+    <div className={styles.modalOverlay} onClick={onCancel}>
+      <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.title}>
           Add New Word
         </h2>
