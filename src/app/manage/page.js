@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
-import AddFlashcard from '../../components/AddFlashcard';
-import EditFlashcard from '../../components/EditFlashcard';
+import FlashcardModal from '../../components/FlashcardModal';
 import styles from './page.module.css';
 
 export default function ManageFlashcards() {
@@ -216,13 +215,13 @@ export default function ManageFlashcards() {
     </main>
 
     {showAddForm && (
-      <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
+      <FlashcardModal onSave={handleAdd} onCancel={() => setShowAddForm(false)} />
     )}
     
     {editingCard && (
-      <EditFlashcard 
+      <FlashcardModal 
         initialData={editingCard} 
-        onUpdate={handleUpdate} 
+        onSave={handleUpdate} 
         onCancel={() => setEditingCard(null)} 
       />
     )}

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import Flashcard from '../components/Flashcard';
-import AddFlashcard from '../components/AddFlashcard';
+import FlashcardModal from '../components/FlashcardModal';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -325,7 +325,7 @@ export default function Home() {
     </main>
 
     {user && showAddForm && (
-      <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
+      <FlashcardModal onSave={handleAdd} onCancel={() => setShowAddForm(false)} />
     )}
     </>
   );
