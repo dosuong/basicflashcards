@@ -323,11 +323,7 @@ export default function Home() {
       )}
 
       {user && showAddForm && (
-        <div className={styles.modalOverlay} onClick={(e) => { if (e.target === e.currentTarget) setShowAddForm(false); }}>
-          <div className={styles.addFormContainer}>
-             <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
-          </div>
-        </div>
+        <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
       )}
     </main>
   );

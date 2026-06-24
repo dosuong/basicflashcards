@@ -110,6 +110,29 @@
 
 /* --- Header --- */
 
+.topNav {
+  margin-bottom: 2rem;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s var(--transition-smooth);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  margin-left: -0.75rem;
+}
+
+.backBtn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(-4px);
+}
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -117,6 +140,22 @@
   margin-bottom: 3rem;
   flex-wrap: wrap;
   gap: 1.5rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 300px;
 }
 
 .header h1 {
@@ -164,30 +203,24 @@
   flex: 1;
   max-width: 400px;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.searchContainer::before {
-  content: '';
+.searchIcon {
   position: absolute;
   left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 1.25rem;
-  height: 1.25rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
+  color: var(--text-secondary);
+  opacity: 0.6;
   pointer-events: none;
   z-index: 1;
   transition: all 0.35s var(--transition-smooth);
-  opacity: 0.6;
 }
 
-.searchContainer:focus-within::before {
+.searchContainer:focus-within .searchIcon {
   opacity: 1;
-  transform: translateY(-50%) scale(1.1);
-  filter: brightness(1.3);
-  animation: searchPulse 1.5s ease-in-out 1;
+  color: #818cf8;
+  transform: scale(1.1);
 }
 
 .searchInput {
@@ -662,6 +695,12 @@
     align-items: flex-start;
     gap: 1rem;
     margin-bottom: 2rem;
+  }
+
+  .headerRight {
+    width: 100%;
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 
   .header h1 {

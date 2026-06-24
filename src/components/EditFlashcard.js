@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import styles from '../app/page.module.css';
+import styles from './Modal.module.css';
 
 export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
   const [word, setWord] = useState(initialData.english_word);
@@ -39,19 +39,12 @@ export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
   };
 
   return (
-    <div className={styles.addFormContainer}>
-      <h2 style={{ 
-        marginBottom: '2rem', 
-        fontSize: '1.75rem', 
-        textAlign: 'center',
-        background: 'linear-gradient(135deg, #818cf8, #c084fc)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        fontWeight: 700
-      }}>
-        Edit Word
-      </h2>
-      <form onSubmit={handleSubmit} className={styles.addForm}>
+    <div className={styles.modalOverlay} onMouseDown={onCancel}>
+      <div className={styles.modalContent} onMouseDown={(e) => e.stopPropagation()}>
+        <h2 className={styles.title}>
+          Edit Word
+        </h2>
+        <form onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
           <label>English Word</label>
           <input 
@@ -59,6 +52,7 @@ export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
             value={word} 
             onChange={(e) => setWord(e.target.value)} 
             required 
+            className={styles.input}
           />
         </div>
         <div className={styles.formGroup}>
@@ -67,7 +61,7 @@ export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
             value={meaning} 
             onChange={(e) => setMeaning(e.target.value)} 
             required 
-            rows="5"
+            className={styles.textarea}
           ></textarea>
         </div>
         <div className={styles.formGroup}>
@@ -75,7 +69,8 @@ export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
           <textarea 
             value={example} 
             onChange={(e) => setExample(e.target.value)} 
-            rows="3"
+            className={styles.textarea}
+            style={{ minHeight: '80px' }}
           ></textarea>
         </div>
         <div className={styles.formGroup} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -89,27 +84,28 @@ export default function EditFlashcard({ initialData, onUpdate, onCancel }) {
           ></div>
           <label 
             onClick={() => setIsLearned(!isLearned)} 
-            style={{ margin: 0, cursor: 'pointer', fontSize: '0.95rem', color: isLearned ? 'var(--success-color)' : 'var(--text-secondary)', transition: 'color 0.2s', fontWeight: 500 }}
+            style={{ margin: 0, cursor: 'pointer', fontSize: '0.95rem', color: isLearned ? 'var(--success-color, #10b981)' : 'var(--text-secondary, #a1a1aa)', transition: 'color 0.2s', fontWeight: 500 }}
           >
             {isLearned ? '✓ Marked as Learned' : 'Mark as Learned'}
           </label>
         </div>
-        <div style={{ display: 'flex', gap: '1rem' }}>
-          <button type="button" onClick={onCancel} className={`${styles.btn} ${styles.btnSecondary}`} style={{ flex: 1 }}>
+        <div className={styles.btnGroup}>
+          <button type="button" onClick={onCancel} className={`${styles.btn} ${styles.btnSecondary}`}>
             Cancel
           </button>
-          <button type="submit" disabled={loading} className={`${styles.btn} ${styles.btnPrimary}`} style={{ flex: 1 }}>
+          <button type="submit" disabled={loading} className={`${styles.btn} ${styles.btnPrimary}`}>
             {loading ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <>
                 <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
                   <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="30 70" strokeLinecap="round" />
                 </svg>
                 Saving...
-              </span>
+              </>
             ) : 'Save Changes'}
           </button>
         </div>
       </form>
     </div>
+  </div>
   );
 }

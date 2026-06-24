@@ -93,40 +93,55 @@ export default function ManageFlashcards() {
 
   return (
     <main className={styles.manageContainer}>
-      <div className={styles.header}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <h1>Manage Cards</h1>
-            {!loading && (
-              <span className={styles.cardCount}>
-                {learnedCount}/{flashcards.length} learned
-              </span>
-            )}
+      <div className={styles.topNav}>
+         <button onClick={() => router.push('/')} className={styles.backBtn}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Learn
+         </button>
+      </div>
+
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1>Deck Library</h1>
+          {!loading && (
+            <span className={styles.cardCount}>
+              <span className={styles.countHighlight}>{learnedCount}</span> / {flashcards.length} learned
+            </span>
+          )}
+        </div>
+        
+        <div className={styles.headerRight}>
+          <div className={styles.searchContainer}>
+            <svg className={styles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              type="text"
+              placeholder="Search words..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={styles.searchInput}
+            />
           </div>
           <button 
             onClick={() => setShowAddForm(true)}
-            className={`${styles.btn} ${styles.btnPrimary}`}
+            className={`${styles.btn} ${styles.btnPrimary} ${styles.addBtn}`}
           >
-            + Add New Word
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span className={styles.addBtnText}>Add Word</span>
           </button>
         </div>
-        <div className={styles.searchContainer} style={{ marginTop: '1rem' }}>
-          <input
-            type="text"
-            placeholder="Search flashcards..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={styles.searchInput}
-          />
-        </div>
-      </div>
+      </header>
 
       {showAddForm && (
-        <div className={styles.modalOverlay} onClick={(e) => { if (e.target === e.currentTarget) setShowAddForm(false); }}>
-          <div className={styles.addFormContainer}>
-             <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
-          </div>
-        </div>
+        <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
       )}
 
       <div className={styles.grid}>
@@ -199,15 +214,11 @@ export default function ManageFlashcards() {
       </div>
 
       {editingCard && (
-        <div className={styles.modalOverlay} onClick={(e) => { if (e.target === e.currentTarget) setEditingCard(null); }}>
-          <div className={styles.modalContent}>
-            <EditFlashcard 
-              initialData={editingCard} 
-              onUpdate={handleUpdate} 
-              onCancel={() => setEditingCard(null)} 
-            />
-          </div>
-        </div>
+        <EditFlashcard 
+          initialData={editingCard} 
+          onUpdate={handleUpdate} 
+          onCancel={() => setEditingCard(null)} 
+        />
       )}
     </main>
   );
