@@ -38,7 +38,7 @@ export default function Home() {
       .from('flashcards')
       .select('*')
       .order('created_at', { ascending: false });
-      
+
     if (error) {
       console.error('Error fetching flashcards:', error);
     } else {
@@ -84,8 +84,8 @@ export default function Home() {
     const handleKeyDown = (e) => {
       // Don't trigger when typing in inputs/textareas
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-      
-      switch(e.key) {
+
+      switch (e.key) {
         case 'ArrowRight':
           e.preventDefault();
           handleNext();
@@ -125,10 +125,10 @@ export default function Home() {
     if (!targetCard) return;
 
     const newStatus = !targetCard.is_learned;
-    
+
     // Optimistic update
     setFlashcards(flashcards.map(c => c.id === targetCard.id ? { ...c, is_learned: newStatus } : c));
-    
+
     // Auto-advance logic for Unlearned tab
     if (filter === 'unlearned' && newStatus === true) {
       setTimeout(() => {
@@ -158,7 +158,7 @@ export default function Home() {
 
   const handleTouchEnd = () => {
     if (!touchStartX.current || !touchEndX.current) return;
-    
+
     const distance = touchStartX.current - touchEndX.current;
     const minSwipeDistance = 50;
 
@@ -169,7 +169,7 @@ export default function Home() {
       // Swipe Right -> Prev
       handlePrev();
     }
-    
+
     // Reset values
     touchStartX.current = null;
     touchEndX.current = null;
@@ -177,7 +177,7 @@ export default function Home() {
 
   return (
     <main className={styles.mainLayout}>
-      <header className={styles.header}>
+      {/* <header className={styles.header}>
         <div className={styles.headerLeft}>
           <h1 className={styles.pageTitle}>Basic Flashcards</h1>
         </div>
@@ -186,24 +186,24 @@ export default function Home() {
             Manage Deck
           </Link>
         </div>
-      </header>
+      </header> */}
 
       <div className={styles.contentWrapper}>
         <div className={styles.dashboardControls}>
           <div className={styles.tabs}>
-            <button 
+            <button
               className={`${styles.tab} ${filter === 'unlearned' ? styles.active : ''}`}
               onClick={() => setFilter('unlearned')}
             >
               Not Learned
             </button>
-            <button 
+            <button
               className={`${styles.tab} ${filter === 'learned' ? styles.active : ''}`}
               onClick={() => setFilter('learned')}
             >
               Learned
             </button>
-            <button 
+            <button
               className={`${styles.tab} ${filter === 'all' ? styles.active : ''}`}
               onClick={() => setFilter('all')}
             >
@@ -243,23 +243,23 @@ export default function Home() {
             </div>
           ) : filteredFlashcards.length > 0 ? (
             <>
-              <div 
-                onTouchStart={handleTouchStart} 
-                onTouchMove={handleTouchMove} 
+              <div
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
                 onTouchEnd={handleTouchEnd}
                 style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
               >
-                <Flashcard 
-                  key={filteredFlashcards[currentIndex].id} 
-                  card={filteredFlashcards[currentIndex]} 
+                <Flashcard
+                  key={filteredFlashcards[currentIndex].id}
+                  card={filteredFlashcards[currentIndex]}
                   onToggleLearned={toggleLearnedStatus}
                   slideDirection={slideDirection}
                 />
               </div>
-              
+
               <div className={styles.controls}>
-                <button 
-                  onClick={handlePrev} 
+                <button
+                  onClick={handlePrev}
                   disabled={currentIndex === 0}
                   className={styles.iconBtn}
                   aria-label="Previous card"
@@ -272,8 +272,8 @@ export default function Home() {
                 <span className={styles.counter}>
                   {currentIndex + 1} / {filteredFlashcards.length}
                 </span>
-                <button 
-                  onClick={handleNext} 
+                <button
+                  onClick={handleNext}
                   disabled={currentIndex === filteredFlashcards.length - 1}
                   className={styles.iconBtn}
                   aria-label="Next card"
@@ -310,7 +310,7 @@ export default function Home() {
       </div>
 
       {user && (
-        <button 
+        <button
           onClick={() => setShowAddForm(true)}
           className={styles.floatingAddBtn}
           title="Add New Word"
