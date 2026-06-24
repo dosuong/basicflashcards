@@ -1,7 +1,8 @@
 'use client';
-
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 import styles from './Navbar.module.css';
@@ -9,6 +10,7 @@ import styles from './Navbar.module.css';
 export default function Navbar() {
   const [user, setUser] = useState(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,7 +50,10 @@ export default function Navbar() {
         <div className={styles.actions}>
           {user ? (
             <>
-              <Link href="/manage" className={`${styles.btn} ${styles.manageBtn}`}>
+              <Link 
+                href="/manage" 
+                className={`${styles.btn} ${styles.manageBtn} ${pathname === '/manage' ? styles.active : ''}`}
+              >
                 Manage
               </Link>
               <button onClick={handleLogout} className={`${styles.btn} ${styles.logoutBtn}`}>
@@ -56,7 +61,10 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <Link href="/login" className={`${styles.btn} ${styles.loginBtn}`}>
+            <Link 
+              href="/login" 
+              className={`${styles.btn} ${styles.loginBtn} ${pathname === '/login' ? styles.active : ''}`}
+            >
               Admin Login
             </Link>
           )}

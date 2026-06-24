@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import Flashcard from '../components/Flashcard';
@@ -14,6 +14,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [filter, setFilter] = useState('unlearned');
+  const [slideDirection, setSlideDirection] = useState(null);
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
@@ -52,6 +53,11 @@ export default function Home() {
     return true;
   });
 
+  // Compute stats
+  const learnedCount = flashcards.filter(c => c.is_learned).length;
+  const unlearnedCount = flashcards.filter(c => !c.is_learned).length;
+  const totalCount = flashcards.length;
+
   // Adjust index if filter changes
   useEffect(() => {
     if (currentIndex >= filteredFlashcards.length) {
@@ -59,17 +65,54 @@ export default function Home() {
     }
   }, [filter, filteredFlashcards.length, currentIndex]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentIndex < filteredFlashcards.length - 1) {
+      setSlideDirection('left');
       setCurrentIndex(currentIndex + 1);
     }
-  };
+  }, [currentIndex, filteredFlashcards.length]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (currentIndex > 0) {
+      setSlideDirection('right');
       setCurrentIndex(currentIndex - 1);
     }
-  };
+  }, [currentIndex]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger when typing in inputs/textareas
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      switch(e.key) {
+        case 'ArrowRight':
+          e.preventDefault();
+          handleNext();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          handlePrev();
+          break;
+        case 'Escape':
+          if (showAddForm) {
+            setShowAddForm(false);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNext, handlePrev, showAddForm]);
+
+  // Clear slide direction after animation
+  useEffect(() => {
+    if (slideDirection) {
+      const timer = setTimeout(() => setSlideDirection(null), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [slideDirection, currentIndex]);
 
   const handleAdd = (newCard) => {
     setFlashcards([newCard, ...flashcards]);
@@ -141,6 +184,24 @@ export default function Home() {
         </Link>
       </div>
 
+      {/* Progress Stats */}
+      {!loading && totalCount > 0 && (
+        <div className={styles.progressStats}>
+          <div className={styles.statItem}>
+            <span className={`${styles.statDot} ${styles.statDotLearned}`}></span>
+            Learned: <span className={styles.statValue}>{learnedCount}</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={`${styles.statDot} ${styles.statDotUnlearned}`}></span>
+            Remaining: <span className={styles.statValue}>{unlearnedCount}</span>
+          </div>
+          <div className={styles.statItem}>
+            <span className={`${styles.statDot} ${styles.statDotTotal}`}></span>
+            Total: <span className={styles.statValue}>{totalCount}</span>
+          </div>
+        </div>
+      )}
+
       <div className={styles.tabs} style={{ marginTop: '1rem' }}>
         <button 
           className={`${styles.tab} ${filter === 'unlearned' ? styles.active : ''}`}
@@ -163,7 +224,15 @@ export default function Home() {
       </div>
 
       {loading ? (
-        <div className={styles.emptyState}>Loading flashcards...</div>
+        /* Skeleton Loading */
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <div className={styles.skeletonCard}></div>
+          <div className={styles.skeletonControls}>
+            <div className={styles.skeletonBtn}></div>
+            <div className={styles.skeletonCounter}></div>
+            <div className={styles.skeletonBtn}></div>
+          </div>
+        </div>
       ) : filteredFlashcards.length > 0 ? (
         <>
           <div 
@@ -176,6 +245,7 @@ export default function Home() {
               key={filteredFlashcards[currentIndex].id} 
               card={filteredFlashcards[currentIndex]} 
               onToggleLearned={toggleLearnedStatus}
+              slideDirection={slideDirection}
             />
           </div>
           
@@ -206,10 +276,26 @@ export default function Home() {
               </svg>
             </button>
           </div>
+
+          {/* Keyboard hints - desktop only */}
+          <div className={styles.keyboardHint}>
+            <span><kbd className={styles.kbdKey}>←</kbd> <kbd className={styles.kbdKey}>→</kbd> navigate</span>
+            <span><kbd className={styles.kbdKey}>Space</kbd> flip</span>
+          </div>
         </>
       ) : (
         <div className={styles.emptyState}>
-          <p>No flashcards found in this category. {user && 'Add some to get started!'}</p>
+          <div className={styles.emptyIcon}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+          </div>
+          <div className={styles.emptyTitle}>No flashcards found</div>
+          <p className={styles.emptyText}>
+            {user ? 'Add some words to get started!' : 'Check back later for new cards.'}
+          </p>
         </div>
       )}
 
@@ -227,7 +313,7 @@ export default function Home() {
       )}
 
       {user && showAddForm && (
-        <div className={styles.modalOverlay}>
+        <div className={styles.modalOverlay} onClick={(e) => { if (e.target === e.currentTarget) setShowAddForm(false); }}>
           <div className={styles.addFormContainer}>
              <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
           </div>

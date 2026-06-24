@@ -13,14 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "English Flashcards",
-  description: "Basic English flashcards web app to master vocabulary.",
+  title: "Cardify — English Flashcards",
+  description: "Master your English vocabulary with beautiful, interactive flashcards. Track progress and learn efficiently.",
+  keywords: "flashcards, english, vocabulary, learning, education",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {/* Animated background orbs */}
+        <div className="bgOrb bgOrb1" aria-hidden="true"></div>
+        <div className="bgOrb bgOrb2" aria-hidden="true"></div>
+        <div className="bgOrb bgOrb3" aria-hidden="true"></div>
+        
         <Navbar />
         {children}
       </body>

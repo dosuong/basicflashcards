@@ -33,8 +33,18 @@ export default function AddFlashcard({ onAdd, onCancel }) {
   };
 
   return (
-    <div className={styles.addFormContainer}>
-      <h2>Add New Word</h2>
+    <div>
+      <h2 style={{ 
+        marginBottom: '2rem', 
+        fontSize: '1.75rem', 
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, #818cf8, #c084fc)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        fontWeight: 700
+      }}>
+        Add New Word
+      </h2>
       <form onSubmit={handleSubmit} className={styles.addForm}>
         <div className={styles.formGroup}>
           <label>English Word</label>
@@ -53,7 +63,7 @@ export default function AddFlashcard({ onAdd, onCancel }) {
             onChange={(e) => setMeaning(e.target.value)} 
             required 
             rows="5"
-            placeholder="e.g. Sự tình cờ may mắn (n)&#10;- pronunciation: ...&#10;- synonyms: ..."
+            placeholder={"e.g. Sự tình cờ may mắn (n)\n- pronunciation: ...\n- synonyms: ..."}
           ></textarea>
         </div>
         <div className={styles.formGroup}>
@@ -72,7 +82,14 @@ export default function AddFlashcard({ onAdd, onCancel }) {
             </button>
           )}
           <button type="submit" disabled={loading} className={`${styles.btn} ${styles.btnPrimary}`} style={{ flex: 1 }}>
-            {loading ? 'Adding...' : 'Add Flashcard'}
+            {loading ? (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="30 70" strokeLinecap="round" />
+                </svg>
+                Adding...
+              </span>
+            ) : 'Add Flashcard'}
           </button>
         </div>
       </form>
