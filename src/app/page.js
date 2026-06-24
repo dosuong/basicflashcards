@@ -176,128 +176,138 @@ export default function Home() {
   };
 
   return (
-    <main className={styles.container}>
-      <div className={styles.topBar}>
-        <div></div>
-        <Link href="/manage" className={`${styles.btn} ${styles.btnSecondary} ${styles.btnSmall}`}>
-          Manage Deck
-        </Link>
-      </div>
-
-      {/* Progress Stats */}
-      {!loading && totalCount > 0 && (
-        <div className={styles.progressStats}>
-          <div className={styles.statItem}>
-            <span className={`${styles.statDot} ${styles.statDotLearned}`}></span>
-            Learned: <span className={styles.statValue}>{learnedCount}</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={`${styles.statDot} ${styles.statDotUnlearned}`}></span>
-            Remaining: <span className={styles.statValue}>{unlearnedCount}</span>
-          </div>
-          <div className={styles.statItem}>
-            <span className={`${styles.statDot} ${styles.statDotTotal}`}></span>
-            Total: <span className={styles.statValue}>{totalCount}</span>
-          </div>
+    <main className={styles.mainLayout}>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <h1 className={styles.pageTitle}>Basic Flashcards</h1>
         </div>
-      )}
-
-      <div className={styles.tabs} style={{ marginTop: '1rem' }}>
-        <button 
-          className={`${styles.tab} ${filter === 'unlearned' ? styles.active : ''}`}
-          onClick={() => setFilter('unlearned')}
-        >
-          Not Learned
-        </button>
-        <button 
-          className={`${styles.tab} ${filter === 'learned' ? styles.active : ''}`}
-          onClick={() => setFilter('learned')}
-        >
-          Learned
-        </button>
-        <button 
-          className={`${styles.tab} ${filter === 'all' ? styles.active : ''}`}
-          onClick={() => setFilter('all')}
-        >
-          All Cards
-        </button>
-      </div>
-
-      {loading ? (
-        /* Skeleton Loading */
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-          <div className={styles.skeletonCard}></div>
-          <div className={styles.skeletonControls}>
-            <div className={styles.skeletonBtn}></div>
-            <div className={styles.skeletonCounter}></div>
-            <div className={styles.skeletonBtn}></div>
-          </div>
+        <div className={styles.headerRight}>
+          <Link href="/manage" className={`${styles.btn} ${styles.btnSecondary} ${styles.btnSmall}`}>
+            Manage Deck
+          </Link>
         </div>
-      ) : filteredFlashcards.length > 0 ? (
-        <>
-          <div 
-            onTouchStart={handleTouchStart} 
-            onTouchMove={handleTouchMove} 
-            onTouchEnd={handleTouchEnd}
-            style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-          >
-            <Flashcard 
-              key={filteredFlashcards[currentIndex].id} 
-              card={filteredFlashcards[currentIndex]} 
-              onToggleLearned={toggleLearnedStatus}
-              slideDirection={slideDirection}
-            />
-          </div>
-          
-          <div className={styles.controls}>
+      </header>
+
+      <div className={styles.contentWrapper}>
+        <div className={styles.dashboardControls}>
+          <div className={styles.tabs}>
             <button 
-              onClick={handlePrev} 
-              disabled={currentIndex === 0}
-              className={styles.iconBtn}
-              aria-label="Previous card"
+              className={`${styles.tab} ${filter === 'unlearned' ? styles.active : ''}`}
+              onClick={() => setFilter('unlearned')}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
+              Not Learned
             </button>
-            <span className={styles.counter}>
-              {currentIndex + 1} / {filteredFlashcards.length}
-            </span>
             <button 
-              onClick={handleNext} 
-              disabled={currentIndex === filteredFlashcards.length - 1}
-              className={styles.iconBtn}
-              aria-label="Next card"
+              className={`${styles.tab} ${filter === 'learned' ? styles.active : ''}`}
+              onClick={() => setFilter('learned')}
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-              </svg>
+              Learned
+            </button>
+            <button 
+              className={`${styles.tab} ${filter === 'all' ? styles.active : ''}`}
+              onClick={() => setFilter('all')}
+            >
+              All Cards
             </button>
           </div>
 
-          {/* Keyboard hints - desktop only */}
-          <div className={styles.keyboardHint}>
-            <span><kbd className={styles.kbdKey}>←</kbd> <kbd className={styles.kbdKey}>→</kbd> navigate</span>
-            <span><kbd className={styles.kbdKey}>Space</kbd> flip</span>
-          </div>
-        </>
-      ) : (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="9" y1="21" x2="9" y2="9"></line>
-            </svg>
-          </div>
-          <div className={styles.emptyTitle}>No flashcards found</div>
-          <p className={styles.emptyText}>
-            {user ? 'Add some words to get started!' : 'Check back later for new cards.'}
-          </p>
+          {/* Progress Stats */}
+          {!loading && totalCount > 0 && (
+            <div className={styles.progressStats}>
+              <div className={styles.statItem}>
+                <span className={`${styles.statDot} ${styles.statDotLearned}`}></span>
+                Learned: <span className={styles.statValue}>{learnedCount}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={`${styles.statDot} ${styles.statDotUnlearned}`}></span>
+                Remaining: <span className={styles.statValue}>{unlearnedCount}</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={`${styles.statDot} ${styles.statDotTotal}`}></span>
+                Total: <span className={styles.statValue}>{totalCount}</span>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+
+        <div className={styles.cardArea}>
+          {loading ? (
+            /* Skeleton Loading */
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+              <div className={styles.skeletonCard}></div>
+              <div className={styles.skeletonControls}>
+                <div className={styles.skeletonBtn}></div>
+                <div className={styles.skeletonCounter}></div>
+                <div className={styles.skeletonBtn}></div>
+              </div>
+            </div>
+          ) : filteredFlashcards.length > 0 ? (
+            <>
+              <div 
+                onTouchStart={handleTouchStart} 
+                onTouchMove={handleTouchMove} 
+                onTouchEnd={handleTouchEnd}
+                style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+              >
+                <Flashcard 
+                  key={filteredFlashcards[currentIndex].id} 
+                  card={filteredFlashcards[currentIndex]} 
+                  onToggleLearned={toggleLearnedStatus}
+                  slideDirection={slideDirection}
+                />
+              </div>
+              
+              <div className={styles.controls}>
+                <button 
+                  onClick={handlePrev} 
+                  disabled={currentIndex === 0}
+                  className={styles.iconBtn}
+                  aria-label="Previous card"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                  </svg>
+                </button>
+                <span className={styles.counter}>
+                  {currentIndex + 1} / {filteredFlashcards.length}
+                </span>
+                <button 
+                  onClick={handleNext} 
+                  disabled={currentIndex === filteredFlashcards.length - 1}
+                  className={styles.iconBtn}
+                  aria-label="Next card"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </button>
+              </div>
+
+              {/* Keyboard hints - desktop only */}
+              <div className={styles.keyboardHint}>
+                <span><kbd className={styles.kbdKey}>←</kbd> <kbd className={styles.kbdKey}>→</kbd> navigate</span>
+                <span><kbd className={styles.kbdKey}>Space</kbd> flip</span>
+              </div>
+            </>
+          ) : (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+              </div>
+              <div className={styles.emptyTitle}>No flashcards found</div>
+              <p className={styles.emptyText}>
+                {user ? 'Add some words to get started!' : 'Check back later for new cards.'}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {user && (
         <button 
