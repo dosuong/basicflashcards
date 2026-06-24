@@ -176,6 +176,7 @@ export default function Home() {
   };
 
   return (
+    <>
     <main className={styles.mainLayout}>
       {/* <header className={styles.header}>
         <div className={styles.headerLeft}>
@@ -321,10 +322,11 @@ export default function Home() {
           </svg>
         </button>
       )}
-
-      {user && showAddForm && (
-        <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
-      )}
     </main>
+
+    {user && showAddForm && (
+      <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
+    )}
+    </>
   );
 }

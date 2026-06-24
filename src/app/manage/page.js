@@ -92,6 +92,7 @@ export default function ManageFlashcards() {
   const learnedCount = flashcards.filter(c => c.is_learned).length;
 
   return (
+    <>
     <main className={styles.manageContainer}>
       <div className={styles.topNav}>
          <button onClick={() => router.push('/')} className={styles.backBtn}>
@@ -140,9 +141,7 @@ export default function ManageFlashcards() {
         </div>
       </header>
 
-      {showAddForm && (
-        <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
-      )}
+
 
       <div className={styles.grid}>
         {loading ? (
@@ -213,13 +212,20 @@ export default function ManageFlashcards() {
         )}
       </div>
 
-      {editingCard && (
-        <EditFlashcard 
-          initialData={editingCard} 
-          onUpdate={handleUpdate} 
-          onCancel={() => setEditingCard(null)} 
-        />
-      )}
+      </div>
     </main>
+
+    {showAddForm && (
+      <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
+    )}
+    
+    {editingCard && (
+      <EditFlashcard 
+        initialData={editingCard} 
+        onUpdate={handleUpdate} 
+        onCancel={() => setEditingCard(null)} 
+      />
+    )}
+    </>
   );
 }
