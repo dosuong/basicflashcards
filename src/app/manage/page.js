@@ -210,8 +210,6 @@ export default function ManageFlashcards() {
           </div>
         )}
       </div>
-
-      </div>
     </main>
 
     {showAddForm && (
