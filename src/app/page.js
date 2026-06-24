@@ -77,24 +77,32 @@ export default function Home() {
     setCurrentIndex(0);
   };
 
-  const toggleLearnedStatus = async () => {
-    const currentCard = filteredFlashcards[currentIndex];
-    if (!currentCard) return;
+  const toggleLearnedStatus = async (card) => {
+    const targetCard = card || filteredFlashcards[currentIndex];
+    if (!targetCard) return;
 
-    const newStatus = !currentCard.is_learned;
+    const newStatus = !targetCard.is_learned;
     
     // Optimistic update
-    setFlashcards(flashcards.map(c => c.id === currentCard.id ? { ...c, is_learned: newStatus } : c));
+    setFlashcards(flashcards.map(c => c.id === targetCard.id ? { ...c, is_learned: newStatus } : c));
     
-    // Note: If filtering hides it, index might be out of bounds, so handle it
-    if (currentIndex >= filteredFlashcards.length - 1 && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+    // Auto-advance logic for Unlearned tab
+    if (filter === 'unlearned' && newStatus === true) {
+      setTimeout(() => {
+        if (currentIndex >= filteredFlashcards.length - 1 && currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+      }, 300);
+    } else {
+      if (currentIndex >= filteredFlashcards.length - 1 && currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      }
     }
 
     await supabase
       .from('flashcards')
       .update({ is_learned: newStatus })
-      .eq('id', currentCard.id);
+      .eq('id', targetCard.id);
   };
 
   const handleTouchStart = (e) => {
@@ -164,7 +172,11 @@ export default function Home() {
             onTouchEnd={handleTouchEnd}
             style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
           >
-            <Flashcard key={filteredFlashcards[currentIndex].id} card={filteredFlashcards[currentIndex]} />
+            <Flashcard 
+              key={filteredFlashcards[currentIndex].id} 
+              card={filteredFlashcards[currentIndex]} 
+              onToggleLearned={toggleLearnedStatus}
+            />
           </div>
           
           <div className={styles.controls}>
@@ -192,16 +204,6 @@ export default function Home() {
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem' }}>
-            <button 
-              onClick={toggleLearnedStatus}
-              className={`${styles.btn} ${styles.btnSecondary}`}
-              style={{ borderColor: filteredFlashcards[currentIndex].is_learned ? 'var(--error-color)' : 'var(--success-color)', color: filteredFlashcards[currentIndex].is_learned ? 'var(--error-color)' : 'var(--success-color)' }}
-            >
-              {filteredFlashcards[currentIndex].is_learned ? 'Mark as Not Learned' : 'Mark as Learned'}
             </button>
           </div>
         </>

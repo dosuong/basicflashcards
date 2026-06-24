@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import styles from '../app/page.module.css';
 
-export default function Flashcard({ card }) {
+export default function Flashcard({ card, onToggleLearned }) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const colors = [
@@ -27,11 +27,18 @@ export default function Flashcard({ card }) {
     <div className={styles.flashcardContainer} onClick={() => setIsFlipped(!isFlipped)}>
       <div className={`${styles.flashcard} ${isFlipped ? styles.flipped : ''}`}>
         <div className={styles.cardFace} style={cardStyle}>
-          {card.is_learned && (
-            <div style={{ position: 'absolute', top: '1rem', right: '1rem' }} className={`${styles.badge} ${styles.badgeLearned}`}>
-              Learned
-            </div>
-          )}
+          <button 
+            className={`${styles.starBtn} ${card.is_learned ? styles.learned : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onToggleLearned) onToggleLearned(card);
+            }}
+            title={card.is_learned ? "Mark as Not Learned" : "Mark as Learned"}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill={card.is_learned ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+          </button>
           <div className={styles.cardContent}>
             <div className={styles.word}>{card.english_word}</div>
           </div>
