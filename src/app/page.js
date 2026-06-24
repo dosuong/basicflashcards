@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import { supabase } from '../lib/supabase';
 import Flashcard from '../components/Flashcard';
 import AddFlashcard from '../components/AddFlashcard';
@@ -12,6 +13,7 @@ export default function Home() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [filter, setFilter] = useState('unlearned');
   const touchStartX = useRef(null);
   const touchEndX = useRef(null);
 
@@ -44,8 +46,21 @@ export default function Home() {
     setLoading(false);
   };
 
+  const filteredFlashcards = flashcards.filter(card => {
+    if (filter === 'learned') return card.is_learned;
+    if (filter === 'unlearned') return !card.is_learned;
+    return true;
+  });
+
+  // Adjust index if filter changes
+  useEffect(() => {
+    if (currentIndex >= filteredFlashcards.length) {
+      setCurrentIndex(Math.max(0, filteredFlashcards.length - 1));
+    }
+  }, [filter, filteredFlashcards.length, currentIndex]);
+
   const handleNext = () => {
-    if (currentIndex < flashcards.length - 1) {
+    if (currentIndex < filteredFlashcards.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
@@ -60,6 +75,26 @@ export default function Home() {
     setFlashcards([newCard, ...flashcards]);
     setShowAddForm(false);
     setCurrentIndex(0);
+  };
+
+  const toggleLearnedStatus = async () => {
+    const currentCard = filteredFlashcards[currentIndex];
+    if (!currentCard) return;
+
+    const newStatus = !currentCard.is_learned;
+    
+    // Optimistic update
+    setFlashcards(flashcards.map(c => c.id === currentCard.id ? { ...c, is_learned: newStatus } : c));
+    
+    // Note: If filtering hides it, index might be out of bounds, so handle it
+    if (currentIndex >= filteredFlashcards.length - 1 && currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
+
+    await supabase
+      .from('flashcards')
+      .update({ is_learned: newStatus })
+      .eq('id', currentCard.id);
   };
 
   const handleTouchStart = (e) => {
@@ -91,9 +126,37 @@ export default function Home() {
 
   return (
     <main className={styles.container}>
+      <div className={styles.topBar}>
+        <div></div>
+        <Link href="/manage" className={`${styles.btn} ${styles.btnSecondary} ${styles.btnSmall}`}>
+          Manage Deck
+        </Link>
+      </div>
+
+      <div className={styles.tabs} style={{ marginTop: '1rem' }}>
+        <button 
+          className={`${styles.tab} ${filter === 'unlearned' ? styles.active : ''}`}
+          onClick={() => setFilter('unlearned')}
+        >
+          Not Learned
+        </button>
+        <button 
+          className={`${styles.tab} ${filter === 'learned' ? styles.active : ''}`}
+          onClick={() => setFilter('learned')}
+        >
+          Learned
+        </button>
+        <button 
+          className={`${styles.tab} ${filter === 'all' ? styles.active : ''}`}
+          onClick={() => setFilter('all')}
+        >
+          All Cards
+        </button>
+      </div>
+
       {loading ? (
         <div className={styles.emptyState}>Loading flashcards...</div>
-      ) : flashcards.length > 0 ? (
+      ) : filteredFlashcards.length > 0 ? (
         <>
           <div 
             onTouchStart={handleTouchStart} 
@@ -101,7 +164,7 @@ export default function Home() {
             onTouchEnd={handleTouchEnd}
             style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
           >
-            <Flashcard key={flashcards[currentIndex].id} card={flashcards[currentIndex]} />
+            <Flashcard key={filteredFlashcards[currentIndex].id} card={filteredFlashcards[currentIndex]} />
           </div>
           
           <div className={styles.controls}>
@@ -117,11 +180,11 @@ export default function Home() {
               </svg>
             </button>
             <span className={styles.counter}>
-              {currentIndex + 1} / {flashcards.length}
+              {currentIndex + 1} / {filteredFlashcards.length}
             </span>
             <button 
               onClick={handleNext} 
-              disabled={currentIndex === flashcards.length - 1}
+              disabled={currentIndex === filteredFlashcards.length - 1}
               className={styles.iconBtn}
               aria-label="Next card"
             >
@@ -131,10 +194,20 @@ export default function Home() {
               </svg>
             </button>
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem' }}>
+            <button 
+              onClick={toggleLearnedStatus}
+              className={`${styles.btn} ${styles.btnSecondary}`}
+              style={{ borderColor: filteredFlashcards[currentIndex].is_learned ? 'var(--error-color)' : 'var(--success-color)', color: filteredFlashcards[currentIndex].is_learned ? 'var(--error-color)' : 'var(--success-color)' }}
+            >
+              {filteredFlashcards[currentIndex].is_learned ? 'Mark as Not Learned' : 'Mark as Learned'}
+            </button>
+          </div>
         </>
       ) : (
         <div className={styles.emptyState}>
-          <p>No flashcards found. {user && 'Add some to get started!'}</p>
+          <p>No flashcards found in this category. {user && 'Add some to get started!'}</p>
         </div>
       )}
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
+import AddFlashcard from '../../components/AddFlashcard';
 import EditFlashcard from '../../components/EditFlashcard';
 import styles from './page.module.css';
 
@@ -12,6 +13,7 @@ export default function ManageFlashcards() {
   const [loading, setLoading] = useState(true);
   const [editingCard, setEditingCard] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -65,6 +67,11 @@ export default function ManageFlashcards() {
     setEditingCard(null);
   };
 
+  const handleAdd = (newCard) => {
+    setFlashcards([newCard, ...flashcards]);
+    setShowAddForm(false);
+  };
+
   const filteredFlashcards = flashcards.filter(card => 
     card.english_word.toLowerCase().includes(searchQuery.toLowerCase()) ||
     card.vietnamese_meaning.toLowerCase().includes(searchQuery.toLowerCase())
@@ -73,8 +80,16 @@ export default function ManageFlashcards() {
   return (
     <main className={styles.manageContainer}>
       <div className={styles.header}>
-        <h1>Manage Cards</h1>
-        <div className={styles.searchContainer}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1>Manage Cards</h1>
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className={`${styles.btn} ${styles.btnPrimary}`}
+          >
+            + Add New Word
+          </button>
+        </div>
+        <div className={styles.searchContainer} style={{ marginTop: '1rem' }}>
           <input
             type="text"
             placeholder="Search flashcards..."
@@ -85,6 +100,14 @@ export default function ManageFlashcards() {
         </div>
       </div>
 
+      {showAddForm && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.addFormContainer}>
+             <AddFlashcard onAdd={handleAdd} onCancel={() => setShowAddForm(false)} />
+          </div>
+        </div>
+      )}
+
       <div className={styles.grid}>
         {loading ? (
           <div className={styles.emptyState}>Loading flashcards...</div>
@@ -92,7 +115,14 @@ export default function ManageFlashcards() {
           filteredFlashcards.map((card) => (
             <div key={card.id} className={styles.card}>
               <div>
-                <div className={styles.itemWord}>{card.english_word}</div>
+                <div className={styles.itemWord}>
+                  {card.english_word}
+                  {card.is_learned && (
+                    <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', padding: '0.2rem 0.5rem', borderRadius: '1rem', background: 'rgba(16, 185, 129, 0.2)', color: 'var(--success-color)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                      Learned
+                    </span>
+                  )}
+                </div>
                 <div className={styles.itemMeaning}>{card.vietnamese_meaning}</div>
                 {card.example_sentence && (
                   <div className={styles.itemExample}>"{card.example_sentence}"</div>

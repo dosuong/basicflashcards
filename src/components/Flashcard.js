@@ -27,6 +27,11 @@ export default function Flashcard({ card }) {
     <div className={styles.flashcardContainer} onClick={() => setIsFlipped(!isFlipped)}>
       <div className={`${styles.flashcard} ${isFlipped ? styles.flipped : ''}`}>
         <div className={styles.cardFace} style={cardStyle}>
+          {card.is_learned && (
+            <div style={{ position: 'absolute', top: '1rem', right: '1rem' }} className={`${styles.badge} ${styles.badgeLearned}`}>
+              Learned
+            </div>
+          )}
           <div className={styles.cardContent}>
             <div className={styles.word}>{card.english_word}</div>
           </div>
